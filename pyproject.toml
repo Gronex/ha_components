@@ -1,0 +1,24 @@
+[project]
+name = "eloverblik"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Mads Sltosbo", email = "mads@slotsbo.eu" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "homeassistant>=2026.2.3",
+    "httpx>=0.28.1",
+    "pydantic>=2.13.4",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.15,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "homeassistant>=2026.2.3",
+    "ruff>=0.15.16",
+]

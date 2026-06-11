@@ -1,0 +1,8 @@
+[
+  {
+    "label": "uv run",
+    "command": "uv",
+    "args": ["run", "--env-file", ".env", "main.py"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+  },
+]
