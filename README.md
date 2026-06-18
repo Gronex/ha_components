@@ -75,12 +75,15 @@ If the token is rejected, the integration will prompt you to re-authenticate.
 ## Energy Dashboard setup
 
 After setup, add the generated sensor(s) to the Energy Dashboard
-(**Settings → Dashboards → Energy**):
+(**Settings → Dashboards → Energy**). Each metering point is exposed as a
+device named after its grid company and city (e.g. *"<grid company>, <city>"*)
+with a single **Consumption** (E17) or **Production** (E18) energy sensor.
+Entity IDs are derived from the device name, so pick the sensor from the
+device in the picker rather than searching for a hard-coded ID:
 
-- **Grid consumption** → `sensor.eloverblik_<metering_point_id>_energy`
-  (consumption / E17 meters).
-- **Return to grid** → the same-named sensor for production (E18) meters, if you
-  enabled production.
+- **Grid consumption** → the *Consumption* sensor on each E17 meter's device.
+- **Return to grid** → the *Production* sensor on each E18 meter's device, if
+  you enabled production.
 
 Long-term history also exists as external statistics under
 `eloverblik:<metering_point_id>_consumption` and
@@ -89,11 +92,15 @@ the Energy Dashboard.
 
 ## Entities
 
-Each metering point creates one device with an **Energy** sensor:
+Each metering point creates one device (named *"<grid company>, <city>"*) with
+a single energy sensor. Entity IDs are derived from the device name and the
+translated entity name (e.g. `sensor.<grid_company>_<city>_consumption`); the
+metering-point ID is stored as the device serial number and the sensor's unique
+ID (`<metering_point_id>_energy`).
 
-| Entity                                           | Class   | State class       | Unit |
-| ------------------------------------------------ | ------- | ----------------- | ---- |
-| `sensor.eloverblik_<metering_point_id>_energy`   | Energy  | Total increasing  | kWh  |
+| Entity (on the device)   | Class   | State class       | Unit |
+| ------------------------ | ------- | ----------------- | ---- |
+| Consumption / Production | Energy  | Total increasing  | kWh  |
 
 ## Limitations
 

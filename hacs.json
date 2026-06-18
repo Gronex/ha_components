@@ -2,6 +2,5 @@
   "name": "Eloverblik",
   "render_readme": true,
   "homeassistant": "2026.6.0",
-  "country": ["DK"],
-  "categories": ["integration"]
+  "country": ["DK"]
 }

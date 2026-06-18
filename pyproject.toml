@@ -6,19 +6,19 @@ readme = "README.md"
 authors = [
     { name = "Mads Sltosbo", email = "mads@slotsbo.eu" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.14.2"
 # The integration is vendored under custom_components/eloverblik and runs inside
 # Home Assistant, which already ships httpx and pydantic. The dependencies below
 # are only required for the standalone dev harness (main.py) and local tooling.
 dependencies = [
-    "homeassistant>=2026.2.3",
+    "homeassistant>=2026.6.0",
     "httpx>=0.28.1",
     "pydantic>=2.13.4",
 ]
 
 [dependency-groups]
 dev = [
-    "homeassistant>=2026.2.3",
+    "homeassistant>=2026.6.0",
     "httpx>=0.28.1",
     "pydantic>=2.13.4",
     "ruff>=0.15.16",
