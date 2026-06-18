@@ -1,0 +1,8 @@
+{
+  "entity": {
+    "sensor": {
+      "energy_consumption": { "default": "mdi:transmission-tower-import" },
+      "energy_production": { "default": "mdi:transmission-tower-export" }
+    }
+  }
+}

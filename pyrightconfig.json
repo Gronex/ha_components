@@ -1,0 +1,18 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.14",
+  "include": ["custom_components", "main.py"],
+  "reportUnannotatedClassAttribute": "none",
+  "reportIncompatibleVariableOverride": "none",
+  "reportUnusedParameter": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownArgumentType": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownParameterType": "none",
+  "reportMissingTypeStubs": "none",
+  "reportMissingParameterType": "none",
+  "reportAny": "none",
+  "reportExplicitAny": "none",
+  "reportUnusedCallResult": "none"
+}

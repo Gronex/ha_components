@@ -959,7 +959,7 @@ wheels = [
 [[package]]
 name = "eloverblik"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "homeassistant", version = "2026.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14.2'" },
     { name = "homeassistant", version = "2026.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14.2'" },
@@ -971,6 +971,8 @@ dependencies = [
 dev = [
     { name = "homeassistant", version = "2026.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14.2'" },
     { name = "homeassistant", version = "2026.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14.2'" },
+    { name = "httpx" },
+    { name = "pydantic" },
     { name = "ruff" },
 ]
 
@@ -984,6 +986,8 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "homeassistant", specifier = ">=2026.2.3" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pydantic", specifier = ">=2.13.4" },
     { name = "ruff", specifier = ">=0.15.16" },
 ]
 

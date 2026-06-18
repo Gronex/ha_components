@@ -1,24 +1,28 @@
 [project]
 name = "eloverblik"
 version = "0.1.0"
-description = "Add your description here"
+description = "Home Assistant custom integration for the Eloverblik (Energinet) customer API"
 readme = "README.md"
 authors = [
     { name = "Mads Sltosbo", email = "mads@slotsbo.eu" }
 ]
 requires-python = ">=3.14"
+# The integration is vendored under custom_components/eloverblik and runs inside
+# Home Assistant, which already ships httpx and pydantic. The dependencies below
+# are only required for the standalone dev harness (main.py) and local tooling.
 dependencies = [
     "homeassistant>=2026.2.3",
     "httpx>=0.28.1",
     "pydantic>=2.13.4",
 ]
 
-[build-system]
-requires = ["uv_build>=0.11.15,<0.12.0"]
-build-backend = "uv_build"
-
 [dependency-groups]
 dev = [
     "homeassistant>=2026.2.3",
+    "httpx>=0.28.1",
+    "pydantic>=2.13.4",
     "ruff>=0.15.16",
 ]
+
+
+

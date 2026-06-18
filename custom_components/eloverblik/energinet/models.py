@@ -1,12 +1,10 @@
 from datetime import datetime
-from typing import List, Optional, Self
+from typing import Self
 
-from attr import dataclass
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field, RootModel
 from pydantic.alias_generators import to_camel
 
 
-@dataclass
 class MeteringPoint(BaseModel):
     model_config = ConfigDict(
         alias_generator=AliasGenerator(
@@ -44,91 +42,87 @@ class MeteringPoint(BaseModel):
 
 
 class SenderMarketParticipantMRID(BaseModel):
-    coding_scheme: Optional[str] = Field(
+    coding_scheme: str | None = Field(
         None, validation_alias="codingScheme", description="Fixed value = A10"
     )
-    name: Optional[str] = Field(
+    name: str | None = Field(
         None,
         description="GLN (Global Location Number) of DataHub. Fixed value = 5790001330583",
     )
 
 
 class TimeInterval(BaseModel):
-    start: Optional[datetime] = Field(
+    start: datetime | None = Field(
         None, description="Start date of period in UTC (ISO 8601)."
     )
-    end: Optional[datetime] = Field(
+    end: datetime | None = Field(
         None, description="End date of period in UTC (ISO 8601)."
     )
 
 
 class MarketEvaluationPointMRID(BaseModel):
-    coding_scheme: Optional[str] = Field(None, validation_alias="codingScheme")
-    name: Optional[str] = Field(
+    coding_scheme: str | None = Field(None, validation_alias="codingScheme")
+    name: str | None = Field(
         None, description="Unique metering point id consisting of 18 characters."
     )
 
 
 class MarketEvaluationPoint(BaseModel):
-    m_rid: Optional[MarketEvaluationPointMRID] = Field(None, validation_alias="mRID")
+    m_r_id: MarketEvaluationPointMRID | None = Field(None, validation_alias="mRID")
 
 
 class DataPoint(BaseModel):
-    position: Optional[str] = Field(None, description="Possible values: 1-96")
-    quantity: Optional[str] = Field(
+    position: str | None = Field(None, description="Possible values: 1-96")
+    quantity: str | None = Field(
         None, validation_alias="out_Quantity.quantity", description="Max 3 decimals"
     )
-    quality: Optional[str] = Field(None, validation_alias="out_Quantity.quality")
+    quality: str | None = Field(None, validation_alias="out_Quantity.quality")
 
 
 class EnergyPeriod(BaseModel):
-    resolution: Optional[str] = Field(
-        None, description="Ex: PT15M, PT1H, P1D, P1M, P1Y"
-    )
-    time_interval: Optional[TimeInterval] = Field(None, validation_alias="timeInterval")
-    points: Optional[List[DataPoint]] = Field(None, validation_alias="Point")
+    resolution: str | None = Field(None, description="Ex: PT15M, PT1H, P1D, P1M, P1Y")
+    time_interval: TimeInterval | None = Field(None, validation_alias="timeInterval")
+    points: list[DataPoint] | None = Field(None, validation_alias="Point")
 
 
 class TimeSeriesItem(BaseModel):
-    m_rid: Optional[str] = Field(
+    m_r_id: str | None = Field(
         None,
         validation_alias="mRID",
         description="Unique metering point id (18 chars).",
     )
-    business_type: Optional[str] = Field(
+    business_type: str | None = Field(
         None, validation_alias="businessType", description="A01, A04, A64"
     )
-    curve_type: Optional[str] = Field(
+    curve_type: str | None = Field(
         None, validation_alias="curveType", description="Always A01"
     )
-    measurement_unit_name: Optional[str] = Field(
+    measurement_unit_name: str | None = Field(
         None, validation_alias="measurement_Unit.name"
     )
-    market_evaluation_point: Optional[MarketEvaluationPoint] = Field(
+    market_evaluation_point: MarketEvaluationPoint | None = Field(
         None, validation_alias="MarketEvaluationPoint"
     )
-    periods: Optional[List[EnergyPeriod]] = Field(None, validation_alias="Period")
+    periods: list[EnergyPeriod] | None = Field(None, validation_alias="Period")
 
 
 class MyEnergyDataMarketDocument(BaseModel):
-    m_rid: Optional[str] = Field(
+    m_r_id: str | None = Field(
         None,
         validation_alias="mRID",
         description="Identification of the market document.",
     )
-    created_date_time: Optional[datetime] = Field(
-        None, validation_alias="createdDateTime"
-    )
-    sender_name: Optional[str] = Field(
+    created_date_time: datetime | None = Field(None, validation_alias="createdDateTime")
+    sender_name: str | None = Field(
         None, validation_alias="sender_MarketParticipant.name"
     )
-    sender_m_rid: Optional[SenderMarketParticipantMRID] = Field(
+    sender_m_r_id: SenderMarketParticipantMRID | None = Field(
         None, validation_alias="sender_MarketParticipant.mRID"
     )
-    period_time_interval: Optional[TimeInterval] = Field(
+    period_time_interval: TimeInterval | None = Field(
         None, validation_alias="period.timeInterval"
     )
-    time_series: Optional[List[TimeSeriesItem]] = Field(
+    time_series: list[TimeSeriesItem] | None = Field(
         None, validation_alias="TimeSeries"
     )
 
@@ -137,17 +131,17 @@ class ResponseItem(BaseModel):
     success: bool = Field(
         ..., description="True if the request succeeded, False if not"
     )
-    error_code: Optional[int] = Field(None, validation_alias="errorCode")
-    error_text: Optional[str] = Field(None, validation_alias="errorText")
-    id: Optional[str] = Field(
+    error_code: int | None = Field(None, validation_alias="errorCode")
+    error_text: str | None = Field(None, validation_alias="errorText")
+    id: str | None = Field(
         None, description="Used to map requests to responses (e.g. metering point id)"
     )
-    stack_trace: Optional[str] = Field(None, validation_alias="stackTrace")
-    market_document: Optional[MyEnergyDataMarketDocument] = Field(
+    stack_trace: str | None = Field(None, validation_alias="stackTrace")
+    market_document: MyEnergyDataMarketDocument | None = Field(
         None, validation_alias="MyEnergyData_MarketDocument"
     )
 
 
 # Because the root of your JSON is an Array/List, we wrap it in a RootModel
-class EnergyDataResponse(RootModel[List[ResponseItem]]):
+class EnergyDataResponse(RootModel[list[ResponseItem]]):
     pass

@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import date, timedelta
 
-from eloverblik.energinet.client import EnerginetClient
+from custom_components.eloverblik.energinet.client import EnerginetClient
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

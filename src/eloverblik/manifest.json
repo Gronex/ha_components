@@ -1,7 +1,0 @@
-{
-  "domain": "eloverblik",
-  "name": "Eloverblik (energinet.dk)",
-  "iot_class": "local_polling",
-  "dependencies": [],
-  "version": "0.0.1"
-}
