@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 Aggregation = Literal["Actual", "Quarter", "Hour", "Day", "Month", "Year"]
 
+BASE_URL = "https://api.eloverblik.dk"
+DEFAULT_TIMEOUT = 60
+
 
 class EnerginetAuthError(Exception):
     """The refresh token was rejected by the Eloverblik token endpoint."""
@@ -30,27 +33,38 @@ class EnerginetClient:
     _token: str | None
     _client: httpx.AsyncClient | None
     _refresh_token: str
+    _owns_client: bool
 
-    def __init__(self, refresh_token: str) -> None:
+    def __init__(self, refresh_token: str, client: httpx.AsyncClient | None = None) -> None:
         self._token = None
         self._refresh_token = refresh_token
-        self._client = None
+        self._client = client
+        # Only clients we construct ourselves (the standalone path used by the
+        # dev harness) should be closed by us. Clients injected by Home
+        # Assistant are created via its httpx_client helper and managed (and
+        # closed on shutdown) by HA itself.
+        self._owns_client = client is None
 
     async def open(self) -> None:
         """Open the underlying HTTP session.
 
-        Safe to call when already open (idempotent).
+        Safe to call when already open (idempotent). A no-op when a client was
+        injected via the constructor.
         """
         if self._client is not None:
             return
-        client = httpx.AsyncClient(base_url="https://api.eloverblik.dk", timeout=60)
+        client = httpx.AsyncClient(base_url=BASE_URL, timeout=DEFAULT_TIMEOUT)
         # AsyncClient.__aenter__ returns the client itself; assign to satisfy
         # call-result checks and keep the reference we just entered.
         self._client = await client.__aenter__()
 
     async def close(self) -> None:
-        """Close the underlying HTTP session."""
-        if self._client is not None:
+        """Close the underlying HTTP session.
+
+        Only closes clients owned by this instance; clients injected from Home
+        Assistant are left untouched so HA can manage their lifecycle.
+        """
+        if self._owns_client and self._client is not None:
             await self._client.__aexit__(None, None, None)
             self._client = None
 

@@ -9,6 +9,7 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.helpers.selector import (
     TextSelector,
     TextSelectorConfig,
@@ -16,7 +17,12 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import CONF_ENABLE_PRODUCTION, CONF_REFRESH_TOKEN, DOMAIN
-from .energinet.client import EnerginetAuthError, EnerginetClient
+from .energinet.client import (
+    BASE_URL,
+    DEFAULT_TIMEOUT,
+    EnerginetAuthError,
+    EnerginetClient,
+)
 from .energinet.models import MeteringPoint
 
 _LOGGER = logging.getLogger(__name__)
@@ -51,7 +57,12 @@ async def _validate_token(
     Raises _InvalidAuth on authentication failure and _CannotConnect on
     network errors; returns the list of metering points otherwise.
     """
-    client = EnerginetClient(refresh_token)
+    client = EnerginetClient(
+        refresh_token,
+        client=create_async_httpx_client(
+            hass, base_url=BASE_URL, timeout=DEFAULT_TIMEOUT
+        ),
+    )
     try:
         await client.open()
         points = await client.async_get_metering_points()

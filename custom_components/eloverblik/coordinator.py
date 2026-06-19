@@ -27,6 +27,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfEnergy
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.helpers.recorder import get_instance
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
@@ -44,7 +45,12 @@ from .const import (
     MIN_UPDATE_INTERVAL_SECONDS,
     TIMESERIES_AGGREGATION,
 )
-from .energinet.client import EnerginetAuthError, EnerginetClient
+from .energinet.client import (
+    BASE_URL,
+    DEFAULT_TIMEOUT,
+    EnerginetAuthError,
+    EnerginetClient,
+)
 from .energinet.models import MeteringPoint, ResponseItem
 
 _LOGGER = logging.getLogger(__name__)
@@ -129,7 +135,12 @@ class EloverblikCoordinator(DataUpdateCoordinator[EloverblikData]):
             name="Eloverblik",
             update_interval=timedelta(seconds=DEFAULT_UPDATE_INTERVAL_SECONDS),
         )
-        self._client = EnerginetClient(config_entry.data[CONF_REFRESH_TOKEN])
+        self._client = EnerginetClient(
+            config_entry.data[CONF_REFRESH_TOKEN],
+            client=create_async_httpx_client(
+                self.hass, base_url=BASE_URL, timeout=DEFAULT_TIMEOUT
+            ),
+        )
         self._metering_points: list[MeteringPoint] | None = None
         # Per-meter scheduling state for the meter-derived polling cadence.
         self._last_meter_update: dict[str, datetime] = {}
