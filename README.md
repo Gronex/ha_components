@@ -5,8 +5,8 @@ your electricity data from the Danish **Eloverblik / Energinet** customer API an
 feeds it into Home Assistant, with first-class support for the **Energy
 Dashboard**.
 
-Consumption data arrives from Energinet with roughly a one-day delay, so this
-integration inserts the historical time series into Home Assistant
+Consumption data from Energinet is published on a per-meter reading schedule,
+so this integration inserts the historical time series into Home Assistant
 **statistics** (which survive restarts and backfill the past) and also exposes
 live energy sensors. This makes the data usable in the Energy Dashboard's
 *Grid consumption* (and optionally *Return to grid*) columns.
@@ -104,8 +104,9 @@ ID (`<metering_point_id>_energy`).
 
 ## Limitations
 
-- **~1 day data delay** — inherent to Eloverblik; yesterday's data arrives
-  today. The live sensor reflects the most recent *available* reading.
+- **Delayed data** — freshness depends on each metering point's reading
+  occurrence (reported by Eloverblik). The live sensor reflects the most
+  recent *available* reading.
 - **API rate limits** — 120 requests/min/IP and a 730-day maximum per request
   (enforced by Energinet). The integration polls hourly and fetches at most 30
   days at a time after the initial backfill.
@@ -125,3 +126,5 @@ uvx basedpyright                   # config in pyrightconfig.json
 
 The integration source lives under `custom_components/eloverblik/`; the
 underlying Energinet API client is in `custom_components/eloverblik/energinet/`.
+
+[Eloverblik customer API documentation](https://docs.eloverblik.dk/en/docs/api/customer#description/introduction)

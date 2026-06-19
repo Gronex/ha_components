@@ -16,7 +16,7 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import CONF_ENABLE_PRODUCTION, CONF_REFRESH_TOKEN, DOMAIN
-from .energinet.client import EnerginetClient
+from .energinet.client import EnerginetAuthError, EnerginetClient
 from .energinet.models import MeteringPoint
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,10 +55,8 @@ async def _validate_token(
     try:
         await client.open()
         points = await client.async_get_metering_points()
-    except RuntimeError as err:
-        if "Authentication" in str(err):
-            raise _InvalidAuth from err
-        raise _CannotConnect from err
+    except EnerginetAuthError as err:
+        raise _InvalidAuth from err
     except httpx.HTTPError as err:
         raise _CannotConnect from err
     finally:

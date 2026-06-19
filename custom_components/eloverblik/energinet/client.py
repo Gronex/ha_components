@@ -13,8 +13,14 @@ logger = logging.getLogger(__name__)
 Aggregation = Literal["Actual", "Quarter", "Hour", "Day", "Month", "Year"]
 
 
+class EnerginetAuthError(Exception):
+    """The refresh token was rejected by the Eloverblik token endpoint."""
+
+
 class EnerginetClient:
     """Client for the Eloverblik / Energinet customer API.
+
+    API docs: https://docs.eloverblik.dk/en/docs/api/customer#description/introduction
 
     Supports use as an async context manager (``async with``) for short-lived
     sessions, as well as explicit :meth:`open` / :meth:`close` for long-lived
@@ -144,19 +150,28 @@ class EnerginetClient:
         )
 
         if response.is_error:
-            logger.error(
-                "Authentication failed",
-                extra={
-                    "code": response.status_code,
-                    "reason": response.reason_phrase,
-                    "response": response.text,
-                },
-            )
-            raise RuntimeError(
-                f"Authentication Error. Got status code {response.status_code}: {response.reason_phrase}"
+            # Only 401/403 mean the refresh token itself was rejected; treat
+            # everything else (5xx, gateway errors, ...) as a transient failure
+            # so the coordinator retries instead of prompting for re-auth.
+            extra = {
+                "code": response.status_code,
+                "reason": response.reason_phrase,
+                "response": response.text,
+            }
+            if response.status_code in (401, 403):
+                logger.error("Refresh token rejected", extra=extra)
+                raise EnerginetAuthError(
+                    f"Refresh token rejected: {response.status_code}"
+                )
+            logger.warning("Transient error fetching access token", extra=extra)
+            raise httpx.HTTPStatusError(
+                f"Token endpoint returned {response.status_code}",
+                request=response.request,
+                response=response,
             )
 
         self._token = response.json()["result"]
+        logger.info("Minted new Eloverblik access token")
 
     async def _execute_with_auth(
         self, cb: Callable[[], Awaitable[httpx.Response]]
@@ -164,7 +179,7 @@ class EnerginetClient:
         await self._ensure_authenticated()
         result = await cb()
         if result.status_code == 401:
-            logger.info("Token stale, refreshing")
+            logger.info("Access token stale (401), refreshing")
             await self._ensure_authenticated(force=True)
             result = await cb()
         return result

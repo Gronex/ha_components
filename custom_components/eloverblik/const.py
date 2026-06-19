@@ -11,9 +11,16 @@ CONF_ENABLE_PRODUCTION = "enable_production"
 METER_TYPE_CONSUMPTION = "E17"
 METER_TYPE_PRODUCTION = "E18"
 
-# Default polling interval. Energinet publishes data with ~1 day delay, so
-# frequent polling adds no value; hourly keeps the "current period" sensor fresh
-# while staying well within the API rate limits (120 req/min per IP).
+# Polling interval bounds, derived from each meter's reading occurrence
+# (meter_reading_occurrence) and clamped to this range. Eloverblik publishes
+# data with ~1 day delay regardless, so the 30-minute floor mainly catches
+# delayed batches sooner; the 6-hour ceiling keeps slow meters from starving
+# statistics. Well within the API rate limits (120 req/min per IP).
+MIN_UPDATE_INTERVAL_SECONDS = 30 * 60
+MAX_UPDATE_INTERVAL_SECONDS = 6 * 60 * 60
+
+# Fallback interval used before the metering-point list is known (first tick)
+# and when no meter's reading occurrence can be parsed.
 DEFAULT_UPDATE_INTERVAL_SECONDS = 3600
 
 # Aggregation used when fetching time series for statistics ingestion.
